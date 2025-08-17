@@ -16,8 +16,11 @@ export const useCartStore = create((set, get) => ({
             get().calculateTotals();
         } catch (error) {
             set({ cart: [] });
-            toast.error(error.response.data.message || "An error occurred" , { id: "unauthorized" });
+            toast.error(error.response.data.message || "An error occurred", { id: "unauthorized" });
         }
+    },
+    clearCart: async () => {
+        set({ cart: [], coupon: null, total: 0, subtotal: 0 });
     },
 
     addToCart: async (product) => {
