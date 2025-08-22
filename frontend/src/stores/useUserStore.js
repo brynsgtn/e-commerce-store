@@ -57,19 +57,19 @@ export const useUserStore = create((set, get) => ({
     },
 
     refreshToken: async () => {
-        // Prevent multiple simultaneous refresh attempts
-        if (get().checkingAuth) return;
+		// Prevent multiple simultaneous refresh attempts
+		if (get().checkingAuth) return;
 
-        set({ checkingAuth: true });
-        try {
-            const response = await axios.post("/auth/refresh-token");
-            set({ checkingAuth: false });
-            return response.data;
-        } catch (error) {
-            set({ user: null, checkingAuth: false });
-            throw error;
-        }
-    },
+		set({ checkingAuth: true });
+		try {
+			const response = await axios.post("/auth/refresh-token");
+			set({ checkingAuth: false });
+			return response.data;
+		} catch (error) {
+			set({ user: null, checkingAuth: false });
+			throw error;
+		}
+	},
 }));
 
 // TODO: Implement the axios interceptors for refreshing access token
@@ -78,47 +78,31 @@ export const useUserStore = create((set, get) => ({
 let refreshPromise = null;
 
 axios.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-        const originalRequest = error.config;
+	(response) => response,
+	async (error) => {
+		const originalRequest = error.config;
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			originalRequest._retry = true;
 
-        // Don't retry refresh-token endpoint to avoid infinite loops
-        if (error.config?.url?.includes('/auth/refresh-token')) {
-            return Promise.reject(error);
-        }
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
+			try {
+				// If a refresh is already in progress, wait for it to complete
+				if (refreshPromise) {
+					await refreshPromise;
+					return axios(originalRequest);
+				}
 
-            try {
-                // If a refresh is already in progress, wait for it to complete
-                if (refreshPromise) {
-                    await refreshPromise;
-                    return axios(originalRequest);
-                }
+				// Start a new refresh process
+				refreshPromise = useUserStore.getState().refreshToken();
+				await refreshPromise;
+				refreshPromise = null;
 
-                // Start a new refresh process
-                refreshPromise = useUserStore.getState().refreshToken();
-                await refreshPromise;
-                refreshPromise = null;
-
-                if (success) {
-                    return axios(originalRequest);
-                } else {
-                    throw new Error('Token refresh failed');
-                }
-
-
-            } catch (refreshError) {
-                refreshPromise = null;
-                // If refresh fails, logout user
-                useUserStore.getState().logout();
-                // Redirect to login if needed
-                if (window.location.pathname !== '/login') {
-                    window.location.href = '/login';
-                }
-                return Promise.reject(refreshError);
-            }
-        }
-        return Promise.reject(error);
-    }
+				return axios(originalRequest);
+			} catch (refreshError) {
+				// If refresh fails, redirect to login or handle as needed
+				useUserStore.getState().logout();
+				return Promise.reject(refreshError);
+			}
+		}
+		return Promise.reject(error);
+	}
 );
