@@ -16,15 +16,5 @@ export default defineConfig({
         secure: false,
       },
     },
-    historyApiFallback: true,
   },
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-  },
-  preview: {
-    historyApiFallback: true,
-  },
-  // Ensure public files (including _redirects) are copied to dist
-  publicDir: 'public'
 });
