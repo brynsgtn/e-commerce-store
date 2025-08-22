@@ -46,6 +46,7 @@ export const createCheckoutSession = async (req, res) => {
             mode: "payment",
             success_url: `${process.env.CLIENT_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.CLIENT_URL}/purchase-cancel`,
+            locale: 'en',
             discounts: coupon
                 ?
                 [
