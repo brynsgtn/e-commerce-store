@@ -5,5 +5,6 @@ dotenv.config();
 
 
 export const redis = new Redis(process.env.UPSTASH_REDIS_URL, {
-  tls: {}, // force TLS
+    tls: {}, // force TLS
+    enableReadyCheck: false,
 });
