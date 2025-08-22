@@ -37,7 +37,7 @@ if (process.env.NODE_ENV === "production") {
 
     // Handle React routing - THIS IS THE MISSING PIECE!
     // This catch-all handler serves React app for any non-API routes
-    app.get("*", (req, res) => {
+    app.get("/^(?!\/api).*/", (req, res) => {
         // Skip API routes
         if (req.path.startsWith('/api/')) {
             return res.status(404).json({ message: "API route not found" });
