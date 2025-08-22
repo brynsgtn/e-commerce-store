@@ -111,7 +111,7 @@ export const refreshToken = async (req, res) => {
         const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
-            return res.statuts(401).json({ message: "No refresh token provided" });
+            return res.status(401).json({ message: "No refresh token provided" });
         }
 
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
