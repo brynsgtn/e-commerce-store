@@ -35,15 +35,36 @@ if (process.env.NODE_ENV === "production") {
     // Serve static files from React build
     app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-    // Handle React routing - THIS IS THE MISSING PIECE!
-    // This catch-all handler serves React app for any non-API routes
-    app.get("/^(?!\/api).*/", (req, res) => {
-        // Skip API routes
-        if (req.path.startsWith('/api/')) {
-            return res.status(404).json({ message: "API route not found" });
-        }
+    // Handle specific React routes that need SPA routing
+    app.get("/", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
 
-        // Serve React app for all other routes (including /purchase-success, /purchase-cancel)
+    app.get("/login", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
+
+    app.get("/signup", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
+
+    app.get("/cart", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
+
+    app.get("/purchase-success", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
+
+    app.get("/purchase-cancel", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
+
+    app.get("/secret-dashboard", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
+
+    app.get("/category/:category", (req, res) => {
         res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
     });
 } else {
