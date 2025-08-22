@@ -32,12 +32,27 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
 if (process.env.NODE_ENV === "production") {
+    // Serve static files from React build
     app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-    app.get("/", (req, res) => {
+    // Handle React routing - THIS IS THE MISSING PIECE!
+    // This catch-all handler serves React app for any non-API routes
+    app.get("*", (req, res) => {
+        // Skip API routes
+        if (req.path.startsWith('/api/')) {
+            return res.status(404).json({ message: "API route not found" });
+        }
+
+        // Serve React app for all other routes (including /purchase-success, /purchase-cancel)
         res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
     });
+} else {
+    // Development fallback
+    app.get("/", (req, res) => {
+        res.json({ message: "API is running in development mode" });
+    });
 }
+
 
 
 app.listen(PORT, () => {
