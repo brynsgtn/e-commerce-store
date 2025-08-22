@@ -66,7 +66,11 @@ export const createCheckoutSession = async (req, res) => {
                     }))
                 ),
             }
+
         });
+
+        console.log("Stripe session created:", session);
+        console.log("Session URL (if using client redirect):", session.url);
 
         if (totalAmount >= 20000) {
             await createNewCoupon(req.user._id);
